@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+    <title>WhyKnot Crochet Creations</title>
+</head>
+<body>
+
+
+
+    <div class="checkout-info">
+        <div class="checkoutForm">
+            <h2>Checkout</h2>
+            <form id="checkout-form" action="/submit-order" method="POST">
+                <h3>Billing Information</h3>
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" required>
+    
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+    
+                <label for="address">Shipping Address</label>
+                <input type="text" id="address" name="address" required>
+    
+                <h3>Payment Information</h3>
+                <label for="cardName">Name on Card</label>
+                <input type="text" id="cardName" name="cardName" required>
+    
+                <label for="cardNumber">Card Number</label>
+                <input type="text" id="cardNumber" name="cardNumber" required>
+    
+                <label for="expMonth">Expiration Month</label>
+                <input type="text" id="expMonth" name="expMonth" placeholder="MM" required>
+    
+                <label for="expYear">Expiration Year</label>
+                <input type="text" id="expYear" name="expYear" placeholder="YYYY" required>
+    
+                <label for="cvv">CVV</label>
+                <input type="text" id="cvv" name="cvv" required>
+            </form>
+        </div>
+    </div>
+
+    <div class="cartTab">
+        <h1>Shopping Cart</h1>
+        <div class="listCart">
+            <!-- Items will be dynamically generated here -->
+        </div>
+        <div class="cart-total">
+            <h2>Total: $<span id="cart-total-price">0.00</span></h2>
+        </div>
+        <div class="btn">
+            <a href="index.html"><button class="close">Close</button></a>
+            <button class="checkout" type="button">Check Out</button>
+        </div>
+    </div>
+    
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const listCart = document.querySelector('.listCart');
+        const cartTotalEl = document.getElementById('cart-total-price');
+       
+
+        // Function to render the cart contents
+        function renderCart() {
+            listCart.innerHTML = ''; // Clear the current cart
+
+            let total = 0;
+
+            if (cart.length === 0) {
+                listCart.innerHTML = '<p>Your cart is empty.</p>';
+               
+            } else {
+                cart.forEach((item, index) => {
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div class="item-info">
+                            <p>${item.name}</p>
+                            <p class="price">$${item.price.toFixed(2)}</p>
+                        </div>
+                        <button class="remove" data-index="${index}">Remove</button>
+                    `;
+                    listCart.appendChild(cartItem);
+                    total += item.price;
+                 
+                });
+            }
+
+            // Update the total price
+            cartTotalEl.textContent = total.toFixed(2);
+
+            attachRemoveEventListeners();
+        }
+    
+        
+
+        // Function to remove items from the cart
+        function removeFromCart(index) {
+            cart.splice(index, 1); // Remove item by index
+            localStorage.setItem('cart', JSON.stringify(cart)); // Update cart in localStorage
+            renderCart(); // Re-render the cart
+        }
+
+        // Attach remove event listeners for each "Remove" button
+        function attachRemoveEventListeners() {
+            document.querySelectorAll('.remove').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = button.getAttribute('data-index');
+                    removeFromCart(index);
+                });
+            });
+        }
+
+        // Initialize cart display on page load
+        renderCart();
+
+        function validateForm() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            const cardName = document.getElementById('cardName').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            const expMonth = document.getElementById('expMonth').value;
+            const expYear = document.getElementById('expYear').value;
+            const cvv = document.getElementById('cvv').value;
+
+            // Check if all form fields are filled
+            if (!fullName || !email || !address || !cardName || !cardNumber || !expMonth || !expYear || !cvv) {
+                alert('Please fill in all the fields.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Function to validate the total amount in the cart
+        function validateCartTotal() {
+            const total = parseFloat(cartTotalEl.textContent);
+            
+            if (total <= 0) {
+                alert('Your cart is empty. Please add items to the cart before checking out.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Function to handle final checkout
+        function finalCheckout(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            // Validate the form and cart total
+            const isFormValid = validateForm();
+            const isCartTotalValid = validateCartTotal();
+
+            // If both form and cart total are valid, show success message
+            if (isFormValid && isCartTotalValid) {
+                alert('Your checkout has been processed successfully!');
+                // Proceed with further checkout actions, e.g., redirect or clear cart
+                window.location.href = "index.html";
+                cart = [];
+                localStorage.removeItem('cart');
+                renderCart();
+            }
+        }
+
+        const checkoutButton = document.querySelector(".checkout");
+        checkoutButton.addEventListener("click", finalCheckout);
+
+
+    </script>
+    
+    
+</body>
+</html>
