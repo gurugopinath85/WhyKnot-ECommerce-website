@@ -14,4 +14,4 @@ I am actively working on the backend and integrating secure transaction APIs/met
   - User Profiles: Implement user accounts to track orders and save wishlists.
   - Payment Integration: Secure payment gateways are being integrated to enable smooth online transactions.
 
-Whyknot is a work in progress and will continue to evolve as the crochet business grows. Stay tuned for product updates and new features!
+Whyknot is a work in progress and will continue to evolve as the crochet business grows. Stay tuned for product updates and new features! I’m eager for any feedback so feel free to reach out.
